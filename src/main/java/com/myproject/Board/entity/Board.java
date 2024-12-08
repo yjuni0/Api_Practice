@@ -6,11 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
+
 
 @Entity
 @Data
@@ -28,7 +27,7 @@ public class Board {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "boardContentImg")
+    @Column(name = "boardContentImg", nullable = false)
     private String boardContentImg;
 
     @Column(name = "createDate", nullable = false, updatable = false)
@@ -39,13 +38,8 @@ public class Board {
     public Board(String title, String content, String boardContentImg) {
         this.title = title;
         this.content = content;
-        this.boardContentImg = boardContentImg;
+        this.boardContentImg = boardContentImg; // 기본 이미지 처리
         this.createDate = LocalDate.now();
     }
 
-    public void update(String title, String content, String boardContentImg) {
-        this.title = title;
-        this.content = content;
-        this.boardContentImg = boardContentImg;
-    }
 }

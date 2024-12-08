@@ -6,20 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-@NoArgsConstructor //기본생성자
-@AllArgsConstructor // 모든 필드값을 파라미터로 받는 생성자
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class AddBoardRequest {
     private String title;
     private String content;
     private MultipartFile boardContentImg;
 
-    public Board toEntity(){ //생성자를 사용해 객체 생성
+    public Board toEntity(String savedFileName) { // 파일 이름을 매핑
         return Board.builder()
                 .title(title)
                 .content(content)
-                .boardContentImg(boardContentImg != null ? boardContentImg.getOriginalFilename() : null)
+                .boardContentImg(savedFileName)
                 .build();
     }
-
 }

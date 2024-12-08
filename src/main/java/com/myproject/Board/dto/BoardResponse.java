@@ -5,18 +5,17 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
-
 @Getter
 public class BoardResponse {
-    private String title;
-    private String content;
-    private String boardContentimg;
-    private LocalDate createDate;
+    private final String title;
+    private final String content;
+    private final String boardContentImg;
+    private final LocalDate createDate;
 
     public BoardResponse(Board board) {
         this.title = board.getTitle();
         this.content = board.getContent();
-        this.boardContentimg=board.getBoardContentImg();
-        this.createDate=board.getCreateDate();
+        this.boardContentImg = board.getBoardContentImg();
+        this.createDate = board.getCreateDate();
     }
 }
