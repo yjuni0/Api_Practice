@@ -61,20 +61,37 @@ public class BoardController {
     @DeleteMapping("/api/board/{id}")
     public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
         try {
-            boolean deleted = fileService.deleteFile(id);
-            if (!deleted) {
+            Board board = boardService.findById(id);
+            if (board == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 게시글이 없으면 404 반환
             }
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 성공 시 204 반환
+
+            // 게시글의 이미지 파일 이름을 받아와서 삭제
+            String boardContentImg = board.getBoardContentImg();
+            boolean deleted = false;
+
+            if (boardContentImg != null && !boardContentImg.equals("default-image.jpg")) {
+                deleted = fileService.deleteFile(boardContentImg); // 파일 삭제 시 파일 이름을 전달
+            }
+
+            // 게시글 삭제
+            if (deleted) {
+                boardService.delete(id);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 성공 시 204 반환
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 파일 삭제 실패 시 404 반환
+            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 실패 시 500 반환
         }
     }
+
     // 게시글 수정
     @PatchMapping("/api/board/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id,
-                                             @RequestParam("title") String title,
-                                             @RequestParam("content") String content,
+                                             @RequestParam(value = "title",required = false) String title,
+                                             @RequestParam(value = "content", required = false) String content,
                                              @RequestParam(value = "boardContentImg", required = false) MultipartFile file) throws IOException {
         // 파일 처리
         String boardContentImg = null;

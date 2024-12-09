@@ -1,21 +1,21 @@
 package com.myproject.Board.service;
 
 import com.myproject.Board.entity.Board;
-import com.myproject.Board.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class FileService {
 
-    private final BoardService boardService;
-    private final BoardRepository boardRepository;
+
+
     // 실제 파일 시스템 경로로 저장
     private static final String UPLOAD_DIR = "/Users/yejun/Desktop/Project/Level1/Board/src/main/resources/static/images/";
 
@@ -26,45 +26,50 @@ public class FileService {
 
         // 디렉토리가 없으면 생성
         File uploadPath = new File(UPLOAD_DIR);
+        if (!uploadPath.exists()) {
+            uploadPath.mkdirs();
+        }
 
-        String fileName = file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename(); // 원본 파일 이름
+        String fileName = originalFileName;
+        String fileExtension = ""; // 파일 확장자
 
-        File destination = new File(uploadPath, fileName);
+        // 확장자 분리
+        int dotIndex = originalFileName.lastIndexOf(".");
+        if (dotIndex > 0) {
+            fileName = originalFileName.substring(0, dotIndex); // 확장자를 제외한 파일 이름
+            fileExtension = originalFileName.substring(dotIndex); // 확장자
+        }
+
+        File destination = new File(uploadPath, originalFileName);
+        int count = 1;
+
+        // 동일한 이름의 파일이 있으면 숫자 붙이기
+        while (destination.exists()) {
+            String newFileName = fileName + "(" + count + ")" + fileExtension;
+            destination = new File(uploadPath, newFileName);
+            count++;
+        }
 
         // 디버깅: 저장 경로 확인
         System.out.println("Saving file to: " + destination.getAbsolutePath());
 
         file.transferTo(destination);
 
-        return fileName; // 클라이언트가 접근할 경로 반환
+        return destination.getName(); // 저장된 파일 이름 반환
     }
-    @Transactional
-    public boolean deleteFile(Long id) throws IOException {
-        // 1. 데이터베이스에서 게시글 조회
-        Board board = boardService.findById(id);
-        if (board == null) {
-            return false; // 게시글이 없으면 false 반환
-        }
 
-        // 2. 파일 경로 가져오기
-        String boardContentImg = board.getBoardContentImg();
-
-        if (boardContentImg != null && !boardContentImg.equals("default-image.jpg")) {
-            // 3. 파일 삭제 처리
-            File file = new File("/Users/yejun/Desktop/Project/Level1/Board/src/main/resources/static/images/" + boardContentImg);
-            if (file.exists()) {
-                if (!file.delete()) {
-                    throw new IOException("Failed to delete file: " + file.getAbsolutePath());
-                }
-            } else {
-                System.out.println("File not found: " + file.getAbsolutePath());
+    public boolean deleteFile(String fileName) throws IOException {
+        // 파일 경로 가져오기
+        File file = new File(UPLOAD_DIR + fileName);
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw new IOException("Failed to delete file: " + file.getAbsolutePath());
             }
+            return true;
+        } else {
+            System.out.println("File not found: " + file.getAbsolutePath());
+            return false;
         }
-
-        // 4. 게시글 삭제
-        boardService.delete(id);
-
-        return true;
     }
-
 }
