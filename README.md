@@ -1,4 +1,5 @@
 <h2>초급 api 연습</h2>
+<p> 파일관련 로직을 잘못 구현해서 주석처리 후 진행 </p>
 
 <h4>post</h4>
 
@@ -16,7 +17,7 @@
 
 ![delete](https://github.com/user-attachments/assets/1fbf1ffc-ffee-4897-be8c-3e3f9e5fec54)
 
-<p> 파일관련 로직을 잘못 구현해서 주석처리 후 진행 </p>
+
 
 <h4>database</h4>
 
