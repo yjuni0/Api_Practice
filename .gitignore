@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 .bat
+.gitattributes
 gradlew
 build/
 !gradle/wrapper/gradle-wrapper.jar
